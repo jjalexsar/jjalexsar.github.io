@@ -1,0 +1,17 @@
+---
+layout: base.njk
+---
+
+<article>
+    <h1>
+        {{ title }}
+    </h1>
+
+    {% if image %}
+    <img src="{{ image | url }}" alt="{{ title }}" width="800">
+    {% endif %}
+
+    <div>
+        {{ content | safe }}
+    </div>
+</article>
