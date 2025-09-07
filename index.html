@@ -1,250 +1,59 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>게시글 목록</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      --bg: #121418;
-      --bg2: #1b2230;
-      --card: #202938;
-      --text: #e7ecf3;
-      --muted: #9fb1c7;
-      --accent: #7aa2ff;
-      --border: #2b374b;
-    }
-    html, body {
-      margin: 0; padding: 0; min-height: 100%;
-      background: linear-gradient(135deg, var(--bg) 0%, var(--bg2) 100%);
-      color: var(--text); font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", Arial, "맑은 고딕", sans-serif;
-    }
-    .wrap { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
-    header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
-    h1 { font-size: 28px; margin: 0; font-weight: 700; letter-spacing: -0.02em; }
-    .desc { color: var(--muted); margin-top: 6px; font-size: 14px; }
-    .search {
-      display: flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-      padding: 10px 12px; border-radius: 12px; width: 100%;
-    }
-    .search input {
-      background: transparent; border: none; outline: none; color: var(--text); width: 100%; font-size: 16px;
-    }
-    .list { margin-top: 16px; display: grid; grid-template-columns: 1fr; gap: 12px; }
-    .item {
-      display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center;
-      background: var(--card); border: 1px solid var(--border); padding: 14px 16px; border-radius: 14px;
-      transition: transform .12s ease, border-color .12s ease;
-    }
-    .item:hover { transform: translateY(-1px); border-color: #3a4d6a; }
-    .item a {
-      color: var(--text); text-decoration: none; font-weight: 600;
-    }
-    .meta { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 13px; }
-    .badge { font-size: 12px; padding: 2px 8px; border: 1px solid var(--border); border-radius: 999px; color: var(--muted); }
-    .count { color: var(--muted); font-size: 14px; margin-top: 10px; }
-    .footer { margin-top: 28px; color: var(--muted); font-size: 12px; }
-    .spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.9s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @media (min-width: 720px) {
-      header { margin-bottom: 28px; }
-      h1 { font-size: 32px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<title>블로그</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div>
-        <h1>게시글 목록</h1>
-        <p class="desc">/post 폴더의 .md 파일을 자동으로 불러와 정렬합니다.</p>
-      </div>
-      <div class="spinner" id="spinner" aria-label="loading" title="loading" hidden></div>
-    </header>
+  <h1>/post 목록</h1>
+  <ul id="list"></ul>
+  <hr>
+  <div id="content">왼쪽에서 글을 선택하세요.</div>
 
-    <div class="search">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M21 21l-4.2-4.2M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2" opacity=".6"/>
-      </svg>
-      <input id="q" type="search" placeholder="제목·파일명·날짜 검색 (예: 2025-09-01, alexander)"/>
-    </div>
-    <div class="count" id="count"></div>
+<script>
+  // === 설정: 본인 레포 정보로 바꾸세요 ===
+  const GITHUB_USER = "your-user";   // 예: jejun-park
+  const REPO        = "your-repo";   // 예: blog
+  const BRANCH      = "main";        // 예: main / gh-pages
+  const POST_DIR    = "post";
 
-    <section class="list" id="list" aria-live="polite"></section>
+  const API = `https://api.github.com/repos/${GITHUB_USER}/${REPO}/contents/${encodeURIComponent(POST_DIR)}?ref=${encodeURIComponent(BRANCH)}`;
 
-    <p class="footer">
-      * 이 페이지는 GitHub Contents API를 사용합니다. 프라이빗 리포지토리인 경우 토큰을 사용한 프록시/서버가 필요합니다.
-    </p>
-  </div>
+  const listEl = document.getElementById("list");
+  const contentEl = document.getElementById("content");
 
-  <script>
-    // ========= 설정값을 본인 리포지토리에 맞게 수정하세요 =========
-    const GITHUB_USER = "jjalexsar";     // 예: jejun-park
-    const REPO        = "jjalexsar.github.io";       // 예: blog
-    const BRANCH      = "main";                 // 예: main 또는 gh-pages
-    const POST_DIR    = "post";                 // md 파일이 들어있는 폴더
-    // 링크 동작: 목록에서 클릭 시 어디로 이동할지 선택
-    //  - "raw": GitHub raw 파일(브라우저에서 MD 원문 표시)
-    //  - "site": 사이트 내 경로(/post/파일명.md)로 링크 (정적 호스트에 md 그대로 두는 경우)
-    //  - "viewer": markdown 뷰어 페이지로 이동(스스로 구현 시)
-    const LINK_MODE   = "site";
+  // 디렉터리 검색 → md 파일 목록 얻기
+  async function loadList(){
+    const res = await fetch(API, { headers: { "Accept": "application/vnd.github+json" } });
+    if(!res.ok) { listEl.innerHTML = "<li>목록을 불러오지 못했습니다.</li>"; return; }
+    const items = (await res.json())
+      .filter(f => f.type === "file" && /\.md(?:own)?$/i.test(f.name));
 
-    // ===============================================================
-    const apiURL = `https://api.github.com/repos/${GITHUB_USER}/${REPO}/contents/${encodeURIComponent(POST_DIR)}?ref=${encodeURIComponent(BRANCH)}`;
-    const spinner = document.getElementById("spinner");
-    const listEl = document.getElementById("list");
-    const countEl = document.getElementById("count");
-    const qEl = document.getElementById("q");
+    // 간단 정렬: 이름 오름차순 (원하면 날짜 파싱해 내림차순으로 변경 가능)
+    items.sort((a,b)=> a.name.localeCompare(b.name,"ko"));
 
-    const state = { posts: [], filtered: [] };
-
-    function showSpinner(show) { spinner.hidden = !show; }
-
-    function isMarkdown(name) {
-      return /\.md(?:own)?$/i.test(name);
+    for(const f of items){
+      const li = document.createElement("li");
+      const a  = document.createElement("a");
+      a.href = "#";
+      a.textContent = f.name;
+      a.onclick = async (e)=>{
+        e.preventDefault();
+        const md = await fetch(f.download_url).then(r=>r.text());
+        contentEl.innerHTML = marked.parse(md);
+        // 마크다운 내 상대경로를 /post 기준으로 처리하고 싶으면 <base> 사용:
+        const base = document.createElement("base");
+        base.href = `/${POST_DIR}/`;
+        document.head.querySelector("base")?.remove();
+        document.head.prepend(base);
+      };
+      li.appendChild(a);
+      listEl.appendChild(li);
     }
+  }
 
-    function parseFrontMatter(text) {
-      // --- YAML front matter --- (아주 단순 파서)
-      // ---
-      // title: Hello
-      // date: 2025-09-01
-      // ---
-      const fmMatch = /^---\s*\n([\s\S]*?)\n---\s*/.exec(text);
-      if (!fmMatch) return {};
-      const lines = fmMatch[1].split(/\r?\n/);
-      const out = {};
-      for (const line of lines) {
-        const m = /^([A-Za-z0-9_-]+)\s*:\s*(.+)$/.exec(line.trim());
-        if (m) out[m[1].toLowerCase()] = m[2].trim().replace(/^["']|["']$/g, "");
-      }
-      return out;
-    }
-
-    function firstHeading(text) {
-      const m = /^\s*#\s+(.+)$|^\s*##\s+(.+)$/m.exec(text);
-      return (m && (m[1] || m[2])) ? (m[1] || m[2]).trim() : "";
-    }
-
-    function dateFromFilename(name) {
-      // 파일명이 2025-09-01-title.md 형태면 날짜 추출
-      const m = /^(\d{4}-\d{2}-\d{2})[-_]/.exec(name);
-      return m ? m[1] : "";
-    }
-
-    function toLinkPath(item) {
-      if (LINK_MODE === "raw") return item.download_url;
-      if (LINK_MODE === "site") return `/${POST_DIR}/${encodeURIComponent(item.name)}`;
-      if (LINK_MODE === "viewer") return `/viewer.html?src=${encodeURIComponent(item.download_url)}`;
-      return item.download_url;
-    }
-
-    function renderList(items) {
-      listEl.innerHTML = "";
-      if (!items.length) {
-        countEl.textContent = "검색 결과가 없습니다.";
-        return;
-      }
-      countEl.textContent = `${items.length}개의 게시글`;
-      const frag = document.createDocumentFragment();
-      for (const it of items) {
-        const a = document.createElement("a");
-        a.href = toLinkPath(it);
-        a.textContent = it.title || it.name;
-        a.rel = "noopener";
-
-        const left = document.createElement("div");
-        left.appendChild(a);
-        const meta = document.createElement("div");
-        meta.className = "meta";
-        if (it.date) {
-          const d = document.createElement("span");
-          d.className = "badge";
-          d.textContent = it.date;
-          meta.appendChild(d);
-        }
-        const f = document.createElement("span");
-        f.textContent = it.name;
-        meta.appendChild(f);
-        left.appendChild(meta);
-
-        const right = document.createElement("div");
-        right.className = "meta";
-        if (it.size) {
-          const sz = document.createElement("span");
-          sz.textContent = `${(it.size/1024).toFixed(1)} KB`;
-          right.appendChild(sz);
-        }
-
-        const item = document.createElement("div");
-        item.className = "item";
-        item.appendChild(left);
-        item.appendChild(right);
-        frag.appendChild(item);
-      }
-      listEl.appendChild(frag);
-    }
-
-    function applyFilter() {
-      const q = qEl.value.trim().toLowerCase();
-      if (!q) {
-        state.filtered = [...state.posts];
-      } else {
-        state.filtered = state.posts.filter(p =>
-          (p.title || "").toLowerCase().includes(q) ||
-          (p.name || "").toLowerCase().includes(q) ||
-          (p.date || "").toLowerCase().includes(q)
-        );
-      }
-      renderList(state.filtered);
-    }
-
-    qEl.addEventListener("input", applyFilter);
-
-    async function load() {
-      showSpinner(true);
-      try {
-        const res = await fetch(apiURL, { headers: { "Accept": "application/vnd.github+json" } });
-        if (!res.ok) throw new Error(`GitHub API ${res.status}`);
-        const files = await res.json();
-        const mdFiles = files.filter(f => f.type === "file" && isMarkdown(f.name));
-
-        // 파일 원문 가져와서 제목/날짜 추출 (프론트매터 > 첫 헤딩 > 파일명)
-        const enriched = await Promise.all(mdFiles.map(async f => {
-          let title="", date="";
-          try {
-            const t = await fetch(f.download_url).then(r => r.text());
-            const fm = parseFrontMatter(t);
-            title = fm.title || firstHeading(t) || f.name.replace(/\.md(?:own)?$/i, "");
-            date  = fm.date || dateFromFilename(f.name) || "";
-          } catch (_) {
-            title = f.name.replace(/\.md(?:own)?$/i, "");
-            date = dateFromFilename(f.name) || "";
-          }
-          return { ...f, title, date };
-        }));
-
-        // 정렬: 날짜(desc) > 제목
-        enriched.sort((a, b) => {
-          const ad = a.date || "0000-00-00";
-          const bd = b.date || "0000-00-00";
-          if (ad !== bd) return bd.localeCompare(ad);
-          return (a.title || a.name).localeCompare(b.title || b.name, "ko");
-        });
-
-        state.posts = enriched;
-        state.filtered = enriched;
-        renderList(state.filtered);
-      } catch (err) {
-        countEl.textContent = "목록을 불러오는 중 오류가 발생했습니다. 설정값을 확인하세요.";
-        console.error(err);
-      } finally {
-        showSpinner(false);
-      }
-    }
-
-    load();
-  </script>
+  loadList();
+</script>
 </body>
 </html>

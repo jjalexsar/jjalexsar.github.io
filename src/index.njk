@@ -1,0 +1,26 @@
+{# src/index.njk #}
+---
+layout: base.njk
+title: "홈"
+siteName: "블로그"
+permalink: "/"
+---
+
+{# home 글 선택 로직 #}
+{% set homePost = null %}
+{% for p in collections.posts %}
+  {% if p.data.home %}
+    {% set homePost = p %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+{% if not homePost %}
+  {# home 표시가 없으면 최신 글(컬렉션의 마지막)을 사용 #}
+  {% set homePost = collections.posts | last %}
+{% endif %}
+
+{% if homePost %}
+  {{ homePost.templateContent | safe }}
+{% else %}
+  <div class="card">아직 포스트가 없습니다. <a href="/posts-list/">목록</a></div>
+{% endif %}
