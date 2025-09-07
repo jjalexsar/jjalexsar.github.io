@@ -2,10 +2,92 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>내 블로그</title>
+  <title>내 블로그 - 역사 워게임</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      font-family: 'Segoe UI', 'Pretendard', Arial, sans-serif;
+      background: linear-gradient(135deg, #181818 0%, #232a34 100%);
+      color: #f1f1f1;
+      box-sizing: border-box;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .container {
+      background: rgba(30, 33, 36, 0.8);
+      border-radius: 18px;
+      padding: 3rem 2rem;
+      box-shadow: 0 8px 32px 0 rgba(24,24,24,0.3);
+      max-width: 600px;
+      margin: 2rem;
+      border: 1px solid #333a45;
+    }
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+      color: #f8c078;
+      text-shadow: 0 2px 16px #000;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin-bottom: 2rem;
+      color: #e0e0e0;
+    }
+    .subtitle {
+      font-size: 1.15rem;
+      margin-bottom: 2.2rem;
+      color: #b0b0b0;
+      font-style: italic;
+    }
+    .cta-btn {
+      display: inline-block;
+      margin-top: 2.5rem;
+      background: linear-gradient(90deg, #d4af37 0%, #a67c52 100%);
+      color: #181818;
+      font-weight: bold;
+      font-size: 1.2rem;
+      padding: 0.9rem 2.2rem;
+      border-radius: 40px;
+      text-decoration: none;
+      transition: box-shadow 0.2s;
+      box-shadow: 0 3px 8px 0 rgba(0,0,0,0.2);
+    }
+    .cta-btn:hover {
+      box-shadow: 0 8px 24px 0 rgba(212,175,55,0.3);
+      background: linear-gradient(90deg, #f3e7b3 0%, #cda56b 100%);
+      color: #232a34;
+    }
+    @media (max-width: 700px) {
+      .container {
+        padding: 2rem 1rem;
+        max-width: 95vw;
+      }
+      h1 { font-size: 2.1rem; }
+      h2 { font-size: 1.15rem; }
+    }
+  </style>
 </head>
 <body>
-  <h1>안녕하세요!</h1>
-  <p>이건 GitHub Pages로 만든 첫 번째 홈페이지입니다 🚀</p>
+  <div class="container">
+    <h1>역사 워게임 블로그</h1>
+    <h2>전쟁과 전략, 그리고 역사적 순간들을 탐험합니다</h2>
+    <div class="subtitle">
+      실제 역사 속 전쟁을 배경으로 한 다양한 워게임, 리뷰와 전략, 그리고 분석을 공유합니다.<br>
+      역사적 분위기와 깊이를 느낄 수 있는 공간에 오신 것을 환영합니다!
+    </div>
+    <a href="#blog" class="cta-btn">블로그 시작하기</a>
+  </div>
 </body>
 </html>
