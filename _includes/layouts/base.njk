@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>{{ title or "블로그" }}</title>
+</head>
+<body>
+  <header>
+    <h1><a href="/">역사게임 블로그</a></h1>
+    <hr/>
+  </header>
+
+  <main>
+    {{ content | safe }}
+  </main>
+
+  <footer>
+    <hr/>
+    <small>© {{ "now" | date("yyyy") }}</small>
+  </footer>
+</body>
+</html>
