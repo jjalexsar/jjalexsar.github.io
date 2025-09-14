@@ -12,6 +12,6 @@ image: "/images/alexander_cover.jpg"
 
 게임의 룰이 너무 방대하고 세세하여 처음 접할땐 정말 감이 안왔지만, 전투 상황에서 펼쳐지는 순간 순간을 스토리 짜듯 흐름을 생각하다보면 또 의외로 그렇게 어렵지도 않다.
 
-![vassal](/src/images/vassal1.png)
+![vassal](/images/vassal1.png)
 
 
