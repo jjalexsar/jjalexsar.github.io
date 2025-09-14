@@ -1,9 +1,9 @@
 ---
 layout: base.njk
-title: Home
+title: JJ's War game Blog
 ---
 
-## Blog Posts
+## JJ's Blog Posts
 
 {% for post in collections.all %}
 
