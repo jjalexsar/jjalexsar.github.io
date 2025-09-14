@@ -2,8 +2,8 @@ name: Build and Deploy Eleventy to GitHub Pages
 
 on:
   push:
-    branches: [main] # main 브랜치에 push할 때 실행
-  workflow_dispatch: # 수동 실행도 가능
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -27,14 +27,28 @@ jobs:
           node-version: "20"
           cache: "npm"
 
-      - name: Install dependencies
-        run: npm ci
+      # package-lock.json이 없다면 npm ci 대신 설치만
+      - name: Install deps
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm i
+          fi
 
+      # 11ty가 devDependencies에 없다면 설치
+      - name: Ensure Eleventy
+        run: npx --yes @11ty/eleventy --version
+
+      # 입력/출력 경로가 다르면 --input/--output 바꾸세요
       - name: Build Eleventy
-        run: npx @11ty/eleventy
+        run: npx @11ty/eleventy --output=_site
 
       - name: Add .nojekyll
         run: touch _site/.nojekyll
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
