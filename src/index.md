@@ -1,5 +1,5 @@
 ---
-layout: base.njk
+layout: base_s.njk
 title: JJ's War game Blog
 ---
 

@@ -1,23 +1,78 @@
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JJ&#39;s War game Blog</title>
-    <link rel="stylesheet" href="/css/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JJ&#39;s War game Blog</title>
+
+  <style>
+    /* 슬라이더 컨테이너 */
+    .slider {
+      position: relative;
+      width: min(960px, 100%);
+      margin: 1.5rem auto;
+      overflow: hidden;
+      border-radius: 16px;
+    }
+    /* 트랙(이미지들을 가로로 나열) */
+    .slider-track {
+      display: flex;
+      transition: transform 300ms ease;
+      touch-action: pan-y;
+    }
+    .slide {
+      min-width: 100%;
+      user-select: none;
+    }
+    .slide img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    /* 네비게이션 버튼 */
+    .slider-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: rgba(0,0,0,.4);
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .slider-btn:focus { outline: 2px solid #fff5; }
+    .slider-btn.prev { left: .5rem; }
+    .slider-btn.next { right: .5rem; }
+
+    /* 인디케이터 점 */
+    .dots {
+      display: flex;
+      gap: .5rem;
+      justify-content: center;
+      margin-top: .75rem;
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 999px;
+      background: #bbb; cursor: pointer;
+    }
+    .dot.active { background: #333; }
+  </style>
 </head>
 <body>
-    <header>
-    <h1><a href="/">JJ&#39;s War game Blog</a></h1>
-    <nav>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/about/">About</a></li>
-        </ul>
-    </nav>
-</header>
-    <main>
-        <h2>JJ's Blog Posts</h2>
+
+  <main class="post">
+    <h1>JJ&#39;s War game Blog</h1>
+
+    
+    
+
+    
+    <article class="content">
+      <h2>JJ's Blog Posts</h2>
 <article>
     <a href="/posts/2025-09-07-hannibal/">Hannibal and Hamilcar</a>
 <p><img src="/images/hannibal_cover.png" alt="Hannibal and Hamilcar" width="250"></p>
@@ -34,7 +89,7 @@
 </article>
 <br>
 <article>
-    <a href="/">JJ's War game Blog</a>
+    <a href="/">JJ&#39;s War game Blog</a>
 </article>
 <br>
 <article>
@@ -42,10 +97,20 @@
 <p><img src="/images/CSR_charles.jpeg" alt="Charles S. Roberts" width="250"></p>
 </article>
 <br>
+<article>
+    <a href="/posts/2025-09-20-alexander_rule/">The Great Battle of Alexander Rules</a>
+<p><img src="/images/Alexander_rules.png" alt="The Great Battle of Alexander Rules" width="250"></p>
+</article>
+<br>
+<article>
+    <a href="/posts/2025-09-20-alexander_short_rule/">The Great Battle of Alexander Short Rules</a>
+<p><img src="/images/Alexander_rules.png" alt="The Great Battle of Alexander Short Rules" width="250"></p>
+</article>
+<br>
 
-    </main>
-    <footer>
-    <p>&copy; made by jjalexsar</p>
-</footer>  
+    </article>
+  </main>
+
+  
 </body>
 </html>
